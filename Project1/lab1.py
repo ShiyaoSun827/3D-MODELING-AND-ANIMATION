@@ -95,11 +95,21 @@ class Node:
 # YOUR OWN HELPER FUNCTIONS #
 #############################
 
-
 #############################
 # YOUR OWN HELPER FUNCTIONS #
 #############################
-
+def return_leaves(root):
+    leaves = []
+    stack = [root]
+    while len(stack) > 0:
+        node = stack.pop()
+        if not node.getLeft() and not node.getRight():
+            leaves.append(node)
+        if node.getRight():
+            stack.append(node.getRight())
+        if node.getLeft():
+            stack.append(node.getLeft())
+    return leaves
 
 ##############################
 # FINISH THE BELOW FUNCTIONS #
@@ -112,7 +122,14 @@ def buildDictionary(message):
       return:
         python dictionary, key = symbol, value = occurrence
     """
-    pass
+    out_put = {}
+    for i in message:
+        if i not in out_put.keys():
+            out_put[i] = 1
+        else:
+            out_put[i] += 1
+    return out_put
+        
 
 def buildHuffmanTree(word_dict):
     """
@@ -122,7 +139,37 @@ def buildHuffmanTree(word_dict):
       return:
         root node of the huffman tree
     """
-    pass
+    #create a dict of nodes(use frequency as values)
+    nodes = {}
+    for i in word_dict.keys():
+        temp = Node(symbol=i,count = word_dict[i])
+        nodes[temp] = word_dict[i]
+    #if len(nodes) == 1:
+        #for i,j in nodes.items():
+            #i.setCodeWord('0')
+        #return i
+   
+  
+  
+    #sort dict
+    sorted_items = sorted(nodes.items(),key = lambda item:item[1],reverse = True)
+    sorted_nodes = {key: value for key, value in sorted_items}
+    #sorted_nodes = dict(sorted_items)
+  
+
+    #find the two smallest value
+    while len(sorted_nodes) > 1:
+        minimum_left_node,value = sorted_nodes.popitem()
+        minimum_right_node,value = sorted_nodes.popitem()
+        internal_node = Node(symbol= None,
+                             count=int(minimum_left_node.getCount() + minimum_right_node.getCount()))
+        internal_node.setLeft(minimum_left_node)
+        internal_node.setRight(minimum_right_node)
+        sorted_nodes[internal_node] = internal_node.getCount()
+        sorted_items = sorted(sorted_nodes.items(),key = lambda item:item[1],reverse = True)
+        sorted_nodes = {key: value for key, value in sorted_items}
+    root,value = sorted_nodes.popitem()
+    return root
 
 def assignCodeWord(root, code_word=''):
     """
@@ -133,7 +180,14 @@ def assignCodeWord(root, code_word=''):
       return:
         no return
     """
-    pass
+    #recursive
+    root.setCodeWord(code_word)
+    if root.getSymbol() is None:
+        left_code = code_word + '0'
+        assignCodeWord(root.getLeft(),left_code)
+        right_code = code_word + '1'
+        assignCodeWord(root.getRight(),right_code)
+
 
 def huffmanEncode(message):
     """
@@ -144,7 +198,23 @@ def huffmanEncode(message):
         a tuple, the first element is the huffman code string for the input message,
         the second element is the huffman tree root node
     """
-    pass
+    encode = ''
+    word_dict = buildDictionary(message)
+    root = buildHuffmanTree(word_dict)
+    #if root.getLeft() is not None or root.getRight() is not None:
+
+    assignCodeWord(root,'')
+    leaves = return_leaves(root)
+    
+    for i in message:
+        for leaf in leaves:
+            if i == leaf.getSymbol():
+                code = leaf.getCodeWord()
+                encode += code
+                break
+    return encode,root
+
+
 
 def huffmanDecode(message, huffman_tree):
     """
@@ -155,13 +225,38 @@ def huffmanDecode(message, huffman_tree):
       return:
         decoded message
     """
-    pass
+    decode = ''
+    temp = ''
+    code = ''
+    if message =='':
+        code = huffman_tree.getSymbol()
+        decode = code*huffman_tree.getCount()
+        return decode
+    leaves = return_leaves(huffman_tree)
+    for i in message:
+        temp += i
+        for leaf in leaves:
+            if temp == leaf.getCodeWord():
+                code = leaf.getSymbol()
+        
+                decode += code
+                temp = ''
+    return decode
+        
+
+    
 
 def main():
     """
     main process goes here
     """
-    pass
+    message = input("Enter a message: ")
+    encoded, rootNode = huffmanEncode(message)
+    decoded = huffmanDecode(encoded, rootNode)
+    print("Encode the message, and the huffman code is: ", encoded)
+    print("Huffman code's length is: ", len(encoded))
+    print("Decode the huffman code, and the decoded message is: ", decoded)
+
 ##############################
 # FINISH THE ABOVE FUNCTIONS #
 ##############################
