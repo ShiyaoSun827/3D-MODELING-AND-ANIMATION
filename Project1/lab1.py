@@ -106,6 +106,9 @@ class Node:
 ##############################
 def buildDictionary(message):
     """
+    In this function, you need to count the occurrence of every symbol in the message and 
+    return it in a python dictionary. The keys of the dictionary are the symbols, the values of 
+    the dictionary is their corresponding occurrences.  
     counts the occurrence of every symbol in the message and store it in a python dictionary
       parameter:
         message: input message string
