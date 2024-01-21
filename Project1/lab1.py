@@ -159,8 +159,30 @@ def buildHuffmanTree(word_dict):
 
     #find the two smallest value
     while len(sorted_nodes) > 1:
-        minimum_left_node,value = sorted_nodes.popitem()
-        minimum_right_node,value = sorted_nodes.popitem()
+        minimum_left_node,valueleft = sorted_nodes.popitem()
+        minimum_right_node,valueright = sorted_nodes.popitem()
+        
+        if valueleft == valueright and minimum_left_node.getSymbol() is not None and minimum_right_node.getSymbol() is not None:
+            temp = []
+            temp.append(minimum_left_node.getSymbol())
+            temp.append(minimum_right_node.getSymbol())
+            done = sorted(temp)
+            if minimum_right_node.getSymbol() == done[0]:
+                a = minimum_right_node
+                b = minimum_left_node
+                minimum_left_node = a
+                minimum_right_node = b
+        elif valueleft == valueright:
+            if minimum_left_node.getSymbol() is  None and minimum_right_node.getSymbol() is  None:
+                pass
+            else:
+                if minimum_right_node.getSymbol() is  None:
+                    a = minimum_right_node
+                    b = minimum_left_node
+                    minimum_left_node = a
+                    minimum_right_node = b
+
+
         internal_node = Node(symbol= None,
                              count=int(minimum_left_node.getCount() + minimum_right_node.getCount()))
         internal_node.setLeft(minimum_left_node)
@@ -250,12 +272,12 @@ def main():
     """
     main process goes here
     """
-    message = input("Enter a message: ")
-    encoded, rootNode = huffmanEncode(message)
-    decoded = huffmanDecode(encoded, rootNode)
-    print("Encode the message, and the huffman code is: ", encoded)
-    print("Huffman code's length is: ", len(encoded))
-    print("Decode the huffman code, and the decoded message is: ", decoded)
+    message = input("Please input your message: ")
+    encode, root = huffmanEncode(message)
+    decode = huffmanDecode(encode, root)
+    print("The huffmanEncode is: ", encode)
+    print("The huffmanEncode's length is: ", len(encode))
+    print("The huffmanDecode is: ", decode)
 
 ##############################
 # FINISH THE ABOVE FUNCTIONS #
