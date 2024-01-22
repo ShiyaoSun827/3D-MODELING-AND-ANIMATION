@@ -99,13 +99,19 @@ class Node:
 # YOUR OWN HELPER FUNCTIONS #
 #############################
 def return_leaves(root):
+    '''
+    parameter: Node: the root of the tree, or the subtree
+
+    return: List: A list of Leave Nodes
+    '''
     leaves = []
     stack = [root]
+    #Use DFS algorithm,and recursion to go through the tree to find the leaves
     while len(stack) > 0:
-        node = stack.pop()
-        if not node.getLeft() and not node.getRight():
-            leaves.append(node)
-        if node.getRight():
+        node = stack.pop()#return and remove the last item in the list(stack)
+        if not node.getLeft() and not node.getRight():#if a node doesn't has childeren
+            leaves.append(node)#it is a leaves
+        if node.getRight():#since the stack is first in first out,no matter which child goes in it first.
             stack.append(node.getRight())
         if node.getLeft():
             stack.append(node.getLeft())
@@ -126,9 +132,12 @@ def buildDictionary(message):
         python dictionary, key = symbol, value = occurrence
     """
     out_put = {}
+    #go through each symbol of the message
     for i in message:
+        #if it is not in the dict, add it in, and count 1
         if i not in out_put.keys():
             out_put[i] = 1
+        #else count += 1
         else:
             out_put[i] += 1
     return out_put
@@ -146,7 +155,7 @@ def buildHuffmanTree(word_dict):
     nodes = {}
     for i in word_dict.keys():
         temp = Node(symbol=i,count = word_dict[i])
-        nodes[temp] = word_dict[i]
+        nodes[temp] = word_dict[i]#use node as key,use frequency as values
     #if len(nodes) == 1:
         #for i,j in nodes.items():
             #i.setCodeWord('0')
@@ -154,30 +163,46 @@ def buildHuffmanTree(word_dict):
    
   
   
-    #sort dict
+    #sort dict,based on the frequency of the node, in decreasing order
     sorted_items = sorted(nodes.items(),key = lambda item:item[1],reverse = True)
     sorted_nodes = {key: value for key, value in sorted_items}
     #sorted_nodes = dict(sorted_items)
+
+    if len(sorted_nodes) == 1:
+        root,frequency = sorted_nodes.popitem()
+        root.setCodeWord('0')
+        return root
   
+    
 
     #find the two smallest value
     while len(sorted_nodes) > 1:
+        #return and remove the last turple of dict, set is as the left child
         minimum_left_node,valueleft = sorted_nodes.popitem()
+        #return and remove the last turple of dict,set it as the right child
         minimum_right_node,valueright = sorted_nodes.popitem()
-        
+        #deal with the order of the symbols, if they have same frequency
+        #This deal with two nodes are all leaves,order them by the alphabet order
         if valueleft == valueright and minimum_left_node.getSymbol() is not None and minimum_right_node.getSymbol() is not None:
+            #add them to a temporary list
             temp = []
             temp.append(minimum_left_node.getSymbol())
             temp.append(minimum_right_node.getSymbol())
+            #sort it in alphabetical order
             done = sorted(temp)
+            #if the first element is different from minimum_left_node, then it means the first element located at before the minimum_left_node
+            #use the first element as new minimum_left_node
             if minimum_right_node.getSymbol() == done[0]:
                 a = minimum_right_node
                 b = minimum_left_node
                 minimum_left_node = a
                 minimum_right_node = b
+        #deal with there exists internal node, which has the same frequency as the leaves
         elif valueleft == valueright:
+            #if both are internal node, then don't need to consider
             if minimum_left_node.getSymbol() is  None and minimum_right_node.getSymbol() is  None:
                 pass
+            #if there exits one internal node, then set the internal node as the minimum_left_node 
             else:
                 if minimum_right_node.getSymbol() is  None:
                     a = minimum_right_node
@@ -185,14 +210,16 @@ def buildHuffmanTree(word_dict):
                     minimum_left_node = a
                     minimum_right_node = b
 
-
+        #create the internal node,set its symbol as None
         internal_node = Node(symbol= None,
                              count=int(minimum_left_node.getCount() + minimum_right_node.getCount()))
-        internal_node.setLeft(minimum_left_node)
-        internal_node.setRight(minimum_right_node)
+        internal_node.setLeft(minimum_left_node)#set its left child
+        internal_node.setRight(minimum_right_node)#set its right child
         sorted_nodes[internal_node] = internal_node.getCount()
+        #sort
         sorted_items = sorted(sorted_nodes.items(),key = lambda item:item[1],reverse = True)
         sorted_nodes = {key: value for key, value in sorted_items}
+    #if only one node left in the list, it means it is a root
     root,value = sorted_nodes.popitem()
     return root
 
@@ -207,7 +234,9 @@ def assignCodeWord(root, code_word=''):
     """
     #recursive
     root.setCodeWord(code_word)
+    #if it encounter the internal root of the tree
     if root.getSymbol() is None:
+        #go left use 0,go right use 1
         left_code = code_word + '0'
         assignCodeWord(root.getLeft(),left_code)
         right_code = code_word + '1'
@@ -227,15 +256,22 @@ def huffmanEncode(message):
     word_dict = buildDictionary(message)
     root = buildHuffmanTree(word_dict)
     #if root.getLeft() is not None or root.getRight() is not None:
-
-    assignCodeWord(root,'')
+    #assign the codeword to the tree
+    if root.getLeft() is not None or root.getRight() is not None:
+        assignCodeWord(root,'')
+    #get the leaves of the tree
     leaves = return_leaves(root)
-    
+    #the message is all same elements
+    if root.getLeft() is  None and root.getRight() is  None:
+        encode = root.getCodeWord()
+        return encode,root
+    #find the corresponding codeword of the symbols in message
     for i in message:
         for leaf in leaves:
             if i == leaf.getSymbol():
                 code = leaf.getCodeWord()
                 encode += code
+                #if is find the symbol, break the for loop(leaves)
                 break
     return encode,root
 
@@ -250,16 +286,24 @@ def huffmanDecode(message, huffman_tree):
       return:
         decoded message
     """
+    #final output
     decode = ''
+    #temp string, use it to store the codeword from message
     temp = ''
+    #use it to store the symbol after decoding
     code = ''
-    if message =='':
+
+    #if the message is all same elements
+    if message =='0':
         code = huffman_tree.getSymbol()
         decode = code*huffman_tree.getCount()
         return decode
+    #elese:
+    #find the leaves
     leaves = return_leaves(huffman_tree)
     for i in message:
         temp += i
+        #find leaf whose codewword is same as temp
         for leaf in leaves:
             if temp == leaf.getCodeWord():
                 code = leaf.getSymbol()
