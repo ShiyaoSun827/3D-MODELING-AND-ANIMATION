@@ -1,13 +1,13 @@
-fig1=figure('Name','3d_sphere.mat','NumberTitle','off');
+fig1=figure('Name','3d_sphere.mat','1','off');
 data = load('3d_sphere.mat');
 
 plot3d_pca(data.X);
 
-fig2=figure('Name','teapot.mat','NumberTitle','off');
+fig2=figure('Name','teapot.mat','2','off');
 data2 = load('teapot.mat');
 plot3d_pca(data2.X);
 
-fig3=figure('Name','bun_zipper.mat','NumberTitle','off');
+fig3=figure('Name','bun_zipper.mat','3','off');
 data3 = load('bun_zipper.mat');
 plot3d_pca(data3.X);
 
