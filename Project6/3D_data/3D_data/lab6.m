@@ -60,7 +60,7 @@ function plot3d_pca(X)
     xlabel('X-axis');
     ylabel('Y-axis');
     zlabel('Z-axis');
-    title('3D PCA Visualization');
+    title('3D');
     grid on;
     axis equal;
 
