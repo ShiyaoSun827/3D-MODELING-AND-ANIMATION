@@ -1,0 +1,72 @@
+%Question(A):
+X = pcread('dragondata/dragon.ply');
+figure(1)
+hold on;
+scatter3(X.Location(:,1), X.Location(:,2), X.Location(:,3),"b.");
+
+%  ---------------- Write your code here  ---------------------------
+
+
+% Release the hold on the current figure
+hold off;
+
+%Questioin(B)
+% Determine the number of points in the point cloud
+N = size(X.Location, 1);
+
+% Display the number of points in the command window
+disp(['Number of points in the model: ' num2str(N)]);
+
+%Number of points in the model: 437645
+
+%  ------------------------------------------------------------------
+
+%Question(C):
+% Perform PCA on the point cloud data
+coeff = pca(X.Location);
+
+% The first eigenvector
+firstEigenvector = coeff(:, 1);
+
+% Display the first eigenvector in the command window
+disp('The first eigenvector of the PCA:');
+disp(firstEigenvector);
+
+%The first eigenvector of the PCA:
+        % 0.8899
+        %-0.4554
+        % 0.0252
+
+%  ------------------------------------------------------------------
+%Question(D):
+% Assuming 'firstEigenvector' is the first principal component from PCA.
+% Transform the points of your model by a rotation, so that the first Eigen Vector becomes the new X-axis.
+
+% Find rotation matrix that aligns the first eigenvector with the x-axis
+% Create an orthogonal matrix where the first column is the first eigenvector
+R = orth([firstEigenvector, rand(3, 2)]);
+
+% Ensure the rotation preserves orientation by checking the determinant
+if det(R) < 0
+    R(:, 2) = -R(:, 2); % Invert the second column if determinant is negative
+end
+
+% The first eigenvector is the new x-axis
+R = R';
+
+% Rotate the point cloud
+transformedPoints = (R * X.Location')';
+
+%Question(E):
+% Sort the transformed points following Part (d), based on the new X values.
+[~, sortIdx] = sort(transformedPoints(:, 1), 'ascend');
+sortedTransformedPoints = transformedPoints(sortIdx, :);
+
+%Question(F):
+% Determine the Minimum X value MinX, and Maximum X value MaxX, following Part (e).
+MinX = min(sortedTransformedPoints(:, 1));
+MaxX = max(sortedTransformedPoints(:, 1));
+
+% Display the minimum and maximum X values in the command window
+disp(['Minimum X value: ' num2str(MinX)]);
+disp(['Maximum X value: ' num2str(MaxX)]);
